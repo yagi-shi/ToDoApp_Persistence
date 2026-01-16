@@ -1,0 +1,8 @@
+# Air のホットリロード用
+tmp/
+
+# ビルドしたバイナリ
+todoapp-persistence
+
+# macOS システムファイル
+.DS_Store

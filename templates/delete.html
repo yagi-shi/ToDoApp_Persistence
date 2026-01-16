@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Todo 削除</title>
+</head>
+
+<body>
+    <h1>Todo 削除</h1>
+
+    <form method="POST" action="/todos/delete?id={{.ID}}">
+        <p>本当に「{{.Title}}」を削除しますか？</p>
+        <button type="submit">削除</button>
+        <a href="/todos">キャンセル</a>
+    </form>
+</body>
+
+</html>

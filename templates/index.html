@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+</head>
+
+<body>
+    <h1>Todo List</h1>
+
+    <form method="POST" action="/todos">
+        <input type="text" name="title" placeholder="Todoを入力">
+        <button type="submit">追加</button>
+    </form>
+
+    <ul>
+        {{range .}}
+        <li>
+            {{.Title}}
+            <a href="/todos/edit?id={{.ID}}">編集</a>
+            <form method="POST" action="/todos/delete?id={{.ID}}" style="display:inline;">
+                <button type="submit">削除</button>
+            </form>
+        </li>
+        {{end}}
+    </ul>
+</body>
+
+</html>
