@@ -21,16 +21,14 @@ func todoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tmpl := template.Must(template.ParseFiles("templates/index.html")) //index.htmlを読み込んでtmplに格納（＝準備）
-	tmpl.Execute(w, todos)                                             //データを埋め込んでレスポンスとして返す（＝実行）
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.Execute(w, todos)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		// クエリパラメータからIDを取得
 		idStr := r.URL.Query().Get("id")
 
-		// 取得したIDを整数に変換
 		idInt, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -42,8 +40,8 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		for _, todo := range todos {
 			if todo.ID == idInt {
 				targetTodo = todo
-				found = true // 見つかった場合、フラグをtrueに設定
-				break        // 見つかった段階でループを抜けることで、無駄な処理を避ける
+				found = true
+				break
 			}
 		}
 		if !found {
@@ -51,7 +49,6 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// 4. テンプレート実行
 		tmpl := template.Must(template.ParseFiles("templates/edit.html"))
 		tmpl.Execute(w, targetTodo)
 	}
@@ -62,14 +59,12 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		idStr := r.URL.Query().Get("id")
 		newTitle := r.FormValue("title")
 
-		// IDを整数に変換
 		idInt, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return
 		}
 
-		// 対応するTodoを更新
 		var found bool
 		for i, todo := range todos {
 			if todo.ID == idInt {
@@ -92,14 +87,12 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		idStr := r.URL.Query().Get("id")
 
-		// IDを整数に変換
 		idInt, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return
 		}
 
-		// 対応するTodoを削除
 		var found bool
 		for i, todo := range todos {
 			if todo.ID == idInt {
