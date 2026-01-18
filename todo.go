@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -117,4 +121,26 @@ func getNextID() int {
 		}
 	}
 	return maxId + 1
+}
+
+// todosをJSONに変換し、ファイルに保存
+func saveTodos() {
+	//①Jsonデータに変換（エンコード）
+	data, err := json.MarshalIndent(todos, "", " ") // Marshal:軽いが可読性低／MarshalIndent:重いが可読性高
+	if err != nil {
+		// log:stderr（標準エラー）、タイムスタンプ有
+		// fmt:標準エラー（stderr）、タイムスタンプ無
+		log.Printf("Json変換エラー：%v", err) //log.Fatall(err)は、強制終了する挙動
+		return
+	}
+	fmt.Println("保存処理：", data)
+
+	// ②ファイルに書き込み
+
+	//ここで書き込みを実施してて、err有->err、err無->nilになり、下記処理に続く。だから、成功だった場合というの処理は不要。
+	err = os.WriteFile("todos.json", data, 0644)
+	if err != nil {
+		log.Printf("ファイルの書き込みエラー：%v", err)
+		return
+	}
 }
