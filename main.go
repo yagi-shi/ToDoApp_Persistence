@@ -6,6 +6,12 @@ import (
 )
 
 func main() {
+	// ▫️saveTodosの動作確認
+	// todos = append(todos, Todo{ID: 1, Title: "買い物に行く"})
+	// todos = append(todos, Todo{ID: 2, Title: "勉強する"})
+	// saveTodos()
+	// return
+
 	http.HandleFunc("/todos", todoHandler)
 	http.HandleFunc("/todos/edit", editHandler)
 	http.HandleFunc("/todos/update", updateHandler)
