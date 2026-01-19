@@ -142,9 +142,86 @@ air
    - エラーハンドリング
    - リダイレクト
 
+## 📊 システムフロー図
+
+### 全体の動作フロー
+
+以下の図は、サーバー起動からリクエスト処理、データ永続化までの全体の流れを示しています。
+
+```mermaid
+flowchart TD
+    Start([開始]) --> ReadFile[ファイルを読む]
+    ReadFile --> CheckFile{ファイル存在?}
+    CheckFile -->|Yes| LoadJson[JSONをデコード]
+    CheckFile -->|No| InitData[空データで初期化]
+    LoadJson --> StartServer[サーバーを起動]
+    InitData --> StartServer
+
+    StartServer --> Loop([リクエスト待機ループ])
+    Loop --> ReceiveReq[リクエストを受信]
+    ReceiveReq --> Route{ルーティング判定}
+
+    Route -->|GET /todos| ShowList[一覧を表示]
+    Route -->|POST /todos| CreateData[データを作成]
+    Route -->|GET /todos/edit| ShowEdit[編集画面を表示]
+    Route -->|POST /todos/update| UpdateData[データを更新]
+    Route -->|POST /todos/delete| DeleteData[データを削除]
+
+    CreateData --> AddMemory[メモリに追加]
+    UpdateData --> ChangeMemory[メモリを変更]
+    DeleteData --> RemoveMemory[メモリから削除]
+
+    AddMemory --> SaveData[データを保存]
+    ChangeMemory --> SaveData
+    RemoveMemory --> SaveData
+
+    SaveData --> EncodeJson[JSONをエンコード]
+    EncodeJson --> WriteFile[ファイルに書く]
+    WriteFile --> SendRedirect[リダイレクトを送信]
+
+    ShowList --> SendHtml[HTMLを送信]
+    ShowEdit --> SendHtml
+
+    SendHtml --> Loop
+    SendRedirect --> Loop
+
+    style Start fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#000
+    style StartServer fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#000
+    style Loop fill:#2196F3,stroke:#1565C0,stroke-width:3px,color:#000
+    style SaveData fill:#FFA726,stroke:#F57C00,stroke-width:2px,color:#000
+    style EncodeJson fill:#FFA726,stroke:#F57C00,stroke-width:2px,color:#000
+    style WriteFile fill:#FF7043,stroke:#D84315,stroke-width:2px,color:#000
+```
+
+### 重要な概念
+
+#### 1. **メモリとファイルの関係**
+
+```
+起動時:  todos.json → メモリ (var todos []Todo)
+実行中:  すべての操作はメモリ上で実行
+変更時:  メモリ → todos.json に保存
+```
+
+#### 2. **データ永続化の仕組み**
+
+- **saveTodos()**: メモリの `todos` を JSON 形式でファイルに保存
+  - ステップ1: Go のスライス → JSON エンコード
+  - ステップ2: JSON → ファイル書き込み
+
+- **loadTodos()**: ファイルから JSON を読み込んでメモリに展開（※実装予定）
+  - ステップ1: ファイル読み込み → JSON データ取得
+  - ステップ2: JSON → Go のスライスにデコード
+
+#### 3. **PRGパターン（Post-Redirect-Get）**
+
+データ変更（POST）の後は必ずリダイレクト：
+- ブラウザのリロード時に再送信されるのを防ぐ
+- URL とページ内容を一致させる
+
 ## 🔄 今後の拡張案
 
-- [ ] データの永続化（ファイル保存 or DB）
+- [x] データの永続化（ファイル保存）← 実装中
 - [ ] Todo の完了/未完了ステータス
 - [ ] Todo の並び替え
 - [ ] 削除時の確認ダイアログ（JavaScript）
