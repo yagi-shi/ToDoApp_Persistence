@@ -144,3 +144,27 @@ func saveTodos() {
 		return
 	}
 }
+
+// ファイルからJSONデータを読み込み、todosに変換して格納
+func loadTodos() {
+	// ①ファイルから読み込み
+	data, err := os.ReadFile("todos.json")
+	if err != nil {
+		if os.IsNotExist(err) { //true->ファイルが存在しない場合のエラー、false->それ以外のエラー(権限エラー等)
+			log.Println("初回起動のためデータが存在しません。")
+			return
+		} else {
+			log.Printf("ファイルの読み込みエラー：%v", err)
+			return
+		}
+	}
+	fmt.Println("読み込みデータ：", data)
+
+	// ②JSONデータをtodosに変換（デコード）
+	err = json.Unmarshal(data, &todos) //todosだと値渡しになり、空のままになるので、&todosで参照渡し(ポインタ渡し)にする必要がある
+	if err != nil {
+		log.Printf("Json変換エラー：%v", err)
+		return
+	}
+	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
+}
