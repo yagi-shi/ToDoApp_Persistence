@@ -6,3 +6,6 @@ todoapp-persistence
 
 # macOS システムファイル
 .DS_Store
+
+# データファイル                                                                              
+todos.json   
