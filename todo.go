@@ -22,6 +22,7 @@ func todoHandler(w http.ResponseWriter, r *http.Request) {
 		title := r.FormValue("title")
 		if title != "" {
 			todos = append(todos, Todo{ID: getNextID(), Title: title})
+			saveTodos()
 		}
 	}
 
@@ -82,6 +83,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		saveTodos()
+
 		// PRGパターン: POST後はリダイレクトし、リロードによる重複送信を防ぐ
 		http.Redirect(w, r, "/todos", http.StatusSeeOther)
 	}
@@ -109,6 +112,9 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Todo not found", http.StatusNotFound)
 			return
 		}
+
+		saveTodos()
+
 		http.Redirect(w, r, "/todos", http.StatusSeeOther)
 	}
 }

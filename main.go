@@ -12,6 +12,9 @@ func main() {
 	// saveTodos()
 	// return
 
+	// ▫️loadTodosの動作確認
+	loadTodos()
+
 	http.HandleFunc("/todos", todoHandler)
 	http.HandleFunc("/todos/edit", editHandler)
 	http.HandleFunc("/todos/update", updateHandler)
