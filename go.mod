@@ -1,4 +1,9 @@
+// go.mod - Go モジュール定義ファイル
+// このファイルはプロジェクトの依存関係を管理します。
+// go get や go mod tidy を実行すると自動的に更新されます。
+
 module todoapp-persistence
-// 使用されるモジュールの依存関係を管理するファイル。基本、何かすれば勝手に追加や修正してくれるので、触らなくて良い。
 
 go 1.25.4
+
+require github.com/mattn/go-sqlite3 v1.14.33 // indirect
