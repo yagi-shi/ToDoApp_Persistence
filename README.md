@@ -16,7 +16,10 @@ Go 標準ライブラリを使った学習用 Todo アプリケーション
   - `net/http`: HTTP サーバー、ルーティング、ハンドラー
   - `html/template`: テンプレートエンジン
   - `strconv`: 型変換
+  - `encoding/json`: JSON エンコード/デコード
+  - `os`: ファイル読み書き
 - **HTML**: サーバーサイドレンダリング
+- **JSON**: データ永続化フォーマット
 - **Air**: ホットリロード（開発用）
 
 ## 🚀 セットアップ
@@ -65,10 +68,11 @@ air
 ```
 03_ToDoApp_Persistence/
 ├── main.go              # エントリーポイント、ルーティング設定
-├── todo.go              # Todo の構造体、ハンドラー関数
+├── todo.go              # Todo の構造体、ハンドラー関数、永続化処理
 ├── templates/           # HTML テンプレート
 │   ├── index.html       # 一覧・追加画面
 │   └── edit.html        # 編集画面
+├── todos.json           # Todo データ（JSON形式で永続化）
 ├── tmp/                 # Air の一時ファイル（.gitignore）
 ├── go.mod               # Go モジュール定義
 ├── .air.toml            # Air 設定ファイル
@@ -137,7 +141,14 @@ air
    - スライス操作
    - ID による要素の特定
 
-5. **Web 開発のベストプラクティス**
+5. **データ永続化（JSON ファイル）**
+   - JSON エンコード/デコード（`json.Marshal`, `json.Unmarshal`）
+   - ファイル I/O（`os.ReadFile`, `os.WriteFile`）
+   - ポインタの理解（値渡し vs ポインタ渡し）
+   - 起動時のデータ読み込み
+   - 変更時のデータ保存
+
+6. **Web 開発のベストプラクティス**
    - PRG パターン
    - エラーハンドリング
    - リダイレクト
@@ -221,7 +232,8 @@ flowchart TD
 
 ## 🔄 今後の拡張案
 
-- [x] データの永続化（ファイル保存）← 実装中
+- [x] データの永続化（JSON ファイル）← 完了
+- [ ] データベース化（SQLite）
 - [ ] Todo の完了/未完了ステータス
 - [ ] Todo の並び替え
 - [ ] 削除時の確認ダイアログ（JavaScript）
