@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	_ "github.com/mattn/go-sqlite3" //ブランクインポート：パッケージの初期化のみを実行し、直接使用しない場合に利用
 )
 
 type Todo struct {
@@ -173,4 +176,21 @@ func loadTodos() {
 		return
 	}
 	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
+}
+
+// データベースを初期化し、テーブルを作る
+func initDb(*sql.DB, error) {
+	// ステップ1: データベースファイルを開く
+	db, err := sql.Open("sqlite3", "./todos.db") //存在する->開く、存在しない->新規作成
+	if err != nil {
+		log.Printf("DBオープン失敗：%v", err)
+		//Goの？慣習
+		// エラーが発生した場合、他の戻り値はゼロ値を返す
+		//   - ポインタ → nil
+		//   - 整数 → 0
+		//   - 文字列 → ""
+		//   - bool → false
+		//   - bool → false
+		return nil, err // 成功->db, nil、失敗->nil, errを返してる
+	}
 }
