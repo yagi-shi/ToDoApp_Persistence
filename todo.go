@@ -179,18 +179,37 @@ func loadTodos() {
 }
 
 // データベースを初期化し、テーブルを作る
-func initDb(*sql.DB, error) {
+func initDB() (*sql.DB, error) { //Goの命名規則では、略語は大文字にする（InitDB）
 	// ステップ1: データベースファイルを開く
 	db, err := sql.Open("sqlite3", "./todos.db") //存在する->開く、存在しない->新規作成
 	if err != nil {
 		log.Printf("DBオープン失敗：%v", err)
-		//Goの？慣習
-		// エラーが発生した場合、他の戻り値はゼロ値を返す
-		//   - ポインタ → nil
-		//   - 整数 → 0
-		//   - 文字列 → ""
-		//   - bool → false
-		//   - bool → false
+
+		/*
+			Goの？慣習
+			エラーが発生した場合、他の戻り値はゼロ値を返す
+			- ポインタ → nil
+			- 整数 → 0
+			- 文字列 → ""
+			- bool → false
+			- bool → false
+		*/
 		return nil, err // 成功->db, nil、失敗->nil, errを返してる
 	}
+
+	// ステップ2: テーブルを作成
+	_, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS todos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL
+        )
+    `)
+	if err != nil {
+		log.Printf("テーブル作成失敗：%v", err)
+		db.Close() //テーブルが作れなかったらDBを閉じる
+		return nil, err
+	}
+
+	// ステップ3: DB接続を返す
+	return db, nil
 }
