@@ -180,21 +180,25 @@ func loadTodos() {
 
 // データベースを初期化し、テーブルを作る
 func initDB() (*sql.DB, error) { //Goの命名規則では、略語は大文字にする（InitDB）
-	// ステップ1: データベースファイルを開く
-	db, err := sql.Open("sqlite3", "./todos.db") //存在する->開く、存在しない->新規作成
+	// ステップ1: データベースファイルを開く（＝接続前の準備）
+
+	// db->*sql.DB型の変数（＝DBを管理するためのオブジェクト）
+	// err->error型の変数。ほとんどの場合はnilだが、ドライバのスペルミス等で致命的なミスがあった場合にはエラーが返る
+	// //存在する->開く、存在しない->新規作成ので、ファイルパスのミスはエラーにならない
+	db, err := sql.Open("sqlite3", "./todos.db")
 	if err != nil {
 		log.Printf("DBオープン失敗：%v", err)
 
 		/*
 			Goの？慣習
-			エラーが発生した場合、他の戻り値はゼロ値を返す
+			エラーが発生した場合、他の戻り値はゼロ値(=zero value)を返す
 			- ポインタ → nil
-			- 整数 → 0
-			- 文字列 → ""
+			- int → 0
+			- string → ""
 			- bool → false
-			- bool → false
+			- struct → structの各フィールドがゼロ値
 		*/
-		return nil, err // 成功->db, nil、失敗->nil, errを返してる
+		return nil, err // 接続に失敗してるので、*sql.DBはnil、errorはerrを返す
 	}
 
 	// ステップ2: テーブルを作成
@@ -211,5 +215,5 @@ func initDB() (*sql.DB, error) { //Goの命名規則では、略語は大文字�
 	}
 
 	// ステップ3: DB接続を返す
-	return db, nil
+	return db, nil //成功しているので、*sql.DBにはdb、errorはnilを返す
 }
