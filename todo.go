@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	_ "github.com/mattn/go-sqlite3" //ブランクインポート：パッケージの初期化のみを実行し、直接使用しない場合に利用
 )
 
 type Todo struct {
@@ -173,4 +176,44 @@ func loadTodos() {
 		return
 	}
 	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
+}
+
+// データベースを初期化し、テーブルを作る
+func initDB() (*sql.DB, error) { //Goの命名規則では、略語は大文字にする（InitDB）
+	// ステップ1: データベースファイルを開く（＝接続前の準備）
+
+	// db->*sql.DB型の変数（＝DBを管理するためのオブジェクト）
+	// err->error型の変数。ほとんどの場合はnilだが、ドライバのスペルミス等で致命的なミスがあった場合にはエラーが返る
+	// //存在する->開く、存在しない->新規作成ので、ファイルパスのミスはエラーにならない
+	db, err := sql.Open("sqlite3", "./todos.db")
+	if err != nil {
+		log.Printf("DBオープン失敗：%v", err)
+
+		/*
+			Goの？慣習
+			エラーが発生した場合、他の戻り値はゼロ値(=zero value)を返す
+			- ポインタ → nil
+			- int → 0
+			- string → ""
+			- bool → false
+			- struct → structの各フィールドがゼロ値
+		*/
+		return nil, err // 接続に失敗してるので、*sql.DBはnil、errorはerrを返す
+	}
+
+	// ステップ2: テーブルを作成
+	_, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS todos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL
+        )
+    `)
+	if err != nil {
+		log.Printf("テーブル作成失敗：%v", err)
+		db.Close() //テーブルが作れなかったらDBを閉じる
+		return nil, err
+	}
+
+	// ステップ3: DB接続を返す
+	return db, nil //成功しているので、*sql.DBにはdb、errorはnilを返す
 }

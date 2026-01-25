@@ -13,7 +13,14 @@ func main() {
 	// return
 
 	// ▫️loadTodosの動作確認
-	loadTodos()
+	// loadTodos()
+
+	// DBを初期化
+	db, err := initDB()
+	if err != nil {
+		log.Fatal("DB初期化失敗:", err)
+	}
+	defer db.Close()
 
 	http.HandleFunc("/todos", todoHandler)
 	http.HandleFunc("/todos/edit", editHandler)
