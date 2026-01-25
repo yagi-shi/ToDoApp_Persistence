@@ -22,6 +22,11 @@ func main() {
 	}
 	defer db.Close()
 
+	err = loadTodosFromDB(db) //initDBのerrはもう使わないので、上書きしてもOK。
+	if err != nil {
+		log.Printf("データの読み込みに失敗しました。：%v", err)
+	}
+
 	http.HandleFunc("/todos", todoHandler)
 	http.HandleFunc("/todos/edit", editHandler)
 	http.HandleFunc("/todos/update", updateHandler)

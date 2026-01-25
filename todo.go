@@ -133,7 +133,7 @@ func getNextID() int {
 }
 
 // todosをJSONに変換し、ファイルに保存
-func saveTodos() {
+func saveTodosToJson() {
 	//①Jsonデータに変換（エンコード）
 	data, err := json.MarshalIndent(todos, "", " ") // Marshal:軽いが可読性低／MarshalIndent:重いが可読性高
 	if err != nil {
@@ -155,7 +155,7 @@ func saveTodos() {
 }
 
 // ファイルからJSONデータを読み込み、todosに変換して格納
-func loadTodos() {
+func loadTodosFromJson() {
 	// ①ファイルから読み込み
 	data, err := os.ReadFile("todos.json")
 	if err != nil {
@@ -176,6 +176,43 @@ func loadTodos() {
 		return
 	}
 	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
+}
+
+func saveTodosToDB(db *sql.DB) error {
+	cmd := "INSERT INTO todos (title) VALUES(?)"
+	for _, todo := range todos {
+		_, err := db.Exec(cmd, todo.Title)
+		if err != nil {
+			log.Printf("データの保存に失敗しました：%v", err)
+			return err
+		}
+	}
+	return nil
+}
+
+// DBからのデータ取得
+func loadTodosFromDB(db *sql.DB) error {
+	// ①クエリ実行
+	cmd := "SELECT id, title FROM todos"
+	rows, err := db.Query(cmd)
+	if err != nil {
+		log.Printf("データがありません：%v", err)
+	}
+	defer rows.Close()
+
+	// ②取得データをスライスに格納
+	todos = []Todo{} //既存データをクリア
+
+	for rows.Next() {
+		var todo Todo
+		err := rows.Scan(&todo.ID, &todo.Title)
+		if err != nil {
+			log.Printf("データの取得に失敗しました：%v", err)
+			continue
+		}
+		todos = append(todos, todo)
+	}
+	return nil
 }
 
 // データベースを初期化し、テーブルを作る
