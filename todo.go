@@ -178,14 +178,11 @@ func loadTodosFromJson() {
 	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
 }
 
-func saveTodosToDB(db *sql.DB) error {
-	cmd := "INSERT INTO todos (title) VALUES(?)"
-	for _, todo := range todos {
-		_, err := db.Exec(cmd, todo.Title)
-		if err != nil {
-			log.Printf("データの保存に失敗しました：%v", err)
-			return err
-		}
+func saveTodosToDB(db *sql.DB, title string) error {
+	_, err := db.Exec("INSERT INTO todos (title) VALUES (?)", title) //SQLはそのまま書く方が好まれる。。？
+	if err != nil {
+		log.Printf("Todo作成失敗: %v", err)
+		return err
 	}
 	return nil
 }
