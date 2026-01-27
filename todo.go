@@ -178,10 +178,31 @@ func loadTodosFromJson() {
 	log.Printf("todos.json から %d 件のデータを読み込みました", len(todos))
 }
 
-func saveTodosToDB(db *sql.DB, title string) error {
+// TodoをDBに追加
+func createTodo(db *sql.DB, title string) error {
 	_, err := db.Exec("INSERT INTO todos (title) VALUES (?)", title) //SQLはそのまま書く方が好まれる。。？
 	if err != nil {
 		log.Printf("Todo作成失敗: %v", err)
+		return err
+	}
+	return nil
+}
+
+// TodoをDBで更新
+func updateTodo(db *sql.DB, id int, title string) error {
+	_, err := db.Exec("UPDATE todos SET title = ? WHERE id = ?", title, id)
+	if err != nil {
+		log.Printf("Todo更新失敗: %v", err)
+		return err
+	}
+	return nil
+}
+
+// TodoをDBから削除
+func deleteTodo(db *sql.DB, id int) error {
+	_, err := db.Exec("DELETE FROM todos WHERE id = ?", id)
+	if err != nil {
+		log.Printf("Todo削除失敗: %v", err)
 		return err
 	}
 	return nil
