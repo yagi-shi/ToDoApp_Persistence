@@ -16,7 +16,8 @@ func main() {
 	// loadTodos()
 
 	// DBを初期化
-	db, err := initDB()
+	var err error
+	db, err = initDB()
 	if err != nil {
 		log.Fatal("DB初期化失敗:", err)
 	}

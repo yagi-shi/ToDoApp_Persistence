@@ -19,6 +19,7 @@ type Todo struct {
 }
 
 var todos []Todo
+var db *sql.DB //ポインタ型でDBを保持
 
 func todoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
